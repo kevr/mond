@@ -78,6 +78,7 @@ def fix_monitors(monitors, active, config):
   if is_docked(monitors, config):
     valid_monitors = docked_monitors(monitors, config)
 
+  last = config[0]["name"]
   for monitor in config:
     if monitor["name"] in valid_monitors:
       cmd.append("--output")
@@ -87,12 +88,13 @@ def fix_monitors(monitors, active, config):
         cmd.append("--primary")
       else:
         cmd.append("--right-of")
-        cmd.append(config[found - 1]["name"])
+        cmd.append(last)
       found += 1
     else:
       cmd.append("--output")
       cmd.append(monitor["name"])
       cmd.append("--off")
+    last = monitor["name"]
 
   global last_cmd
   rc = 0
