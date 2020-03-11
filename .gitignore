@@ -1,0 +1,9 @@
+/venv/
+
+/src/.coverage
+/src/__pycache__/
+/src/cov_html/
+/src/pytestdebug.log
+
+*.pyc
+

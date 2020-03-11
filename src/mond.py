@@ -12,10 +12,12 @@ from subprocess import Popen, PIPE
 ARGUMENT_ERROR = 1
 CONFIG_NOT_FOUND_ERROR = 2
 CONFIG_ERROR = 3
+HOME_NOT_FOUND_ERROR = 4
 OK = 0
 
 # Last command global cache
 last_cmd = None
+running = True
 
 class ProcessError(Exception): pass
 
@@ -112,7 +114,8 @@ def do_manage(config, timeout):
   # Convert config list into { "name": <config_item> }
 
   logging.info("mond started")
-  while True:
+  is_running = True
+  while is_running:
     monitors = []
     active_monitors = []
     try:
@@ -129,7 +132,10 @@ def do_manage(config, timeout):
     logging.debug("Active Monitors: %s" % str(active_monitors))
     time.sleep(timeout)
 
-def parse_arguments():
+    global running
+    is_running = running
+
+def parse_arguments(args):
   parser = argparse.ArgumentParser()
   parser.add_argument(
       "-d", "--daemon",
@@ -149,14 +155,14 @@ def parse_arguments():
       "-t", "--timeout",
       dest="timeout",
       default=5)
-  args = parser.parse_args()
+  args = parser.parse_args(args)
   if args.daemon and not args.log_path:
     raise ValueError("--daemon requires a --log to be provided")
   return args
 
 def main(): 
   try:
-    args = parse_arguments()
+    args = parse_arguments(sys.argv[1:])
   except ValueError as e:
     print("ERROR: %s" % e)
     return ARGUMENT_ERROR
@@ -179,7 +185,8 @@ def main():
   logging.debug("Starting mond...")
 
   if "HOME" not in os.environ:
-    logging.warn("Unable to find HOME environment variable")
+    logging.error("Unable to find HOME environment variable")
+    return HOME_NOT_FOUND_ERROR
 
   home_dir = os.environ["HOME"]
   config_dir = os.path.join(home_dir, ".config/mond")
@@ -208,6 +215,6 @@ def main():
 
   return OK
 
-if __name__ == "__main__":
-  e = main()
-  exit(e)
+if __name__ == "__main__": # pragma: no cover
+  e = main() # pragma: no cover
+  exit(e) # pragma: no cover
