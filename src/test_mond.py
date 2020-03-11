@@ -54,6 +54,15 @@ def test_daemon_no_log(mocker):
 
 def test_daemon(mocker):
 
+  config = """
+  [{"name": "DP-0", "docked": true}, {"name": "DP-2", "docked": true}]
+  """
+
+  mocker.patch('mond.os.path.exists', return_value=True)
+  mocker.patch('mond.open',
+    mocker.mock_open(read_data=config.encode("UTF-8"))
+  )
+
   mocker.patch('mond.os.fork', return_value=0)
   mocker.patch('mond.Popen', make_mock_popen(0))
 
