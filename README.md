@@ -1,6 +1,8 @@
 mond
 ----
 
+[![Build Status](https://travis-ci.org/kevr/mond.svg?branch=master)](https://travis-ci.org/kevr/mond)
+
 A monitor management daemon for X sessions.
 
 ## Configuration
