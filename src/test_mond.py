@@ -29,8 +29,8 @@ def make_mock_popen(rv, out='', active_out=''):
 # Perform some generic test mocks for mond and return the module.
 def mock_mond(mocker, argv):
   mocker.patch('mond.running', False)
-  mocker.patch('time.sleep', lambda secs: secs)
-  mocker.patch('sys.argv', ["mond"] + argv)
+  mocker.patch('mond.time.sleep', lambda secs: secs)
+  mocker.patch('mond.sys.argv', ["mond"] + argv)
 
   import mond
   return mond
@@ -42,8 +42,7 @@ def test_verbose(mocker):
   mond.main()
 
 def test_no_home_var(mocker):
-  mocker.patch('os.environ', {})
-  import os
+  mocker.patch('mond.os.environ', {})
   mond = mock_mond(mocker, ["-v"])
   rc = mond.main()
   assert rc == mond.HOME_NOT_FOUND_ERROR
@@ -55,14 +54,13 @@ def test_daemon_no_log(mocker):
 
 def test_daemon(mocker):
 
-  mocker.patch('os.fork', return_value=0)
+  mocker.patch('mond.os.fork', return_value=0)
   mocker.patch('mond.Popen', make_mock_popen(0))
 
-  import os
   mond = mock_mond(mocker, ["--daemon", "--log", "test.log"])
   mond.main()
 
-  os.fork.assert_called()
+  mond.os.fork.assert_called()
 
 def test_no_config(mocker):
   mocker.patch('mond.os.path.exists', return_value=False)
