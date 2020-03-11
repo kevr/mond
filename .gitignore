@@ -1,4 +1,6 @@
 /venv/
+/.coverage
+/cov_html/
 
 /src/.coverage
 /src/__pycache__/
